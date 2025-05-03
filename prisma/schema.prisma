@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  ADMIN
+  PROFESOR
+  TUTOR
+}
+
+model User {
+  id           String   @id @default(uuid())
+  nombre       String
+  apellido     String
+  creationDate DateTime @default(now())
+  telefono     String
+  rol          Rol
+  email        String   @unique
+  password     String
+  activo       Boolean  @default(true)
+
+  // Relaciones con DetalleDerivacion según el rol
+  detallesAdmin  DetalleDerivacion[] @relation("AdminDetalles")
+  detallesTutora DetalleDerivacion[] @relation("TutoraDetalles")
+  derivaciones   Derivacion[]        @relation("ProfesorDerivaciones")
+}
+
+model Estudiante {
+  id       String @id @default(uuid())
+  foto     String
+  nombre   String
+  apellido String
+  telefono String
+  correo   String @unique
+  cfp      String
+  semestre String
+  carrera  String
+  curso    String
+  periodo  String
+
+  derivaciones Derivacion[] // 1 estudiante -> muchas derivaciones
+}
+
+model Derivacion {
+  id              String   @id @default(uuid())
+  idDocente       String
+  idEstudiante    String
+  fechaDerivacion DateTime @default(now())
+
+  docente    User       @relation("ProfesorDerivaciones", fields: [idDocente], references: [id])
+  estudiante Estudiante @relation(fields: [idEstudiante], references: [id])
+
+  detalle DetalleDerivacion? @relation("DerivacionDetalle")
+
+  @@index([idDocente])
+  @@index([idEstudiante])
+}
+
+model DetalleDerivacion {
+  id               String   @id @default(uuid())
+  idAdmin          String
+  idDerivacion     String   @unique // relación uno a uno
+  motivoDerivacion String
+  idTutora         String
+  atencion         String
+  fechaAtencion    DateTime @default(now())
+
+  admin      User       @relation("AdminDetalles", fields: [idAdmin], references: [id])
+  tutora     User       @relation("TutoraDetalles", fields: [idTutora], references: [id])
+  derivacion Derivacion @relation("DerivacionDetalle", fields: [idDerivacion], references: [id])
+
+  @@index([idAdmin])
+  @@index([idTutora])
+  @@index([idDerivacion])
+}
