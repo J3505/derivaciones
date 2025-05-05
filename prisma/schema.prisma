@@ -31,7 +31,7 @@ model User {
   password     String
   activo       Boolean  @default(true)
 
-  // Relaciones con DetalleDerivacion según el rol
+  // Relaciones
   detallesAdmin  DetalleDerivacion[] @relation("AdminDetalles")
   detallesTutora DetalleDerivacion[] @relation("TutoraDetalles")
   derivaciones   Derivacion[]        @relation("ProfesorDerivaciones")
@@ -50,32 +50,31 @@ model Estudiante {
   curso    String
   periodo  String
 
-  derivaciones Derivacion[] // 1 estudiante -> muchas derivaciones
+  derivaciones Derivacion[]
 }
 
 model Derivacion {
   id              String   @id @default(uuid())
   idDocente       String
   idEstudiante    String
+  motivo          String
   fechaDerivacion DateTime @default(now())
 
-  docente    User       @relation("ProfesorDerivaciones", fields: [idDocente], references: [id])
-  estudiante Estudiante @relation(fields: [idEstudiante], references: [id])
-
-  detalle DetalleDerivacion? @relation("DerivacionDetalle")
+  docente    User               @relation("ProfesorDerivaciones", fields: [idDocente], references: [id])
+  estudiante Estudiante         @relation(fields: [idEstudiante], references: [id])
+  detalle    DetalleDerivacion? @relation("DerivacionDetalle")
 
   @@index([idDocente])
   @@index([idEstudiante])
 }
 
 model DetalleDerivacion {
-  id               String   @id @default(uuid())
-  idAdmin          String
-  idDerivacion     String   @unique // relación uno a uno
-  motivoDerivacion String
-  idTutora         String
-  atencion         String
-  fechaAtencion    DateTime @default(now())
+  id            String   @id @default(uuid())
+  idAdmin       String
+  idDerivacion  String   @unique
+  idTutora      String
+  atencion      String
+  fechaAtencion DateTime @default(now())
 
   admin      User       @relation("AdminDetalles", fields: [idAdmin], references: [id])
   tutora     User       @relation("TutoraDetalles", fields: [idTutora], references: [id])

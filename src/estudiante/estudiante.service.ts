@@ -40,7 +40,7 @@ export class EstudianteService {
 
   findAll() {
     return this.prisma.estudiante.findMany({
-      orderBy: { nombre: 'asc' },
+      orderBy: { apellido: 'asc' },
     });
   }
 

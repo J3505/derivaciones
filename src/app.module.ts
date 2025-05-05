@@ -4,6 +4,8 @@ import { EstudianteModule } from './estudiante/estudiante.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { DerivacionModule } from './derivacion/derivacion.module';
+import { DetalleDerivacionModule } from './detalle-derivacion/detalle-derivacion.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { JwtModule } from '@nestjs/jwt';
       secret: process.env.JWT_SECRET || 'default_secret',
       signOptions: { expiresIn: '1d' },
     }),
+    DerivacionModule,
+    DetalleDerivacionModule,
   ],
 })
 export class AppModule {}
